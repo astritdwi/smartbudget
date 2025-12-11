@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="SmartBudget - Aplikasi manajemen keuangan pribadi dengan AI recommendations">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SmartBudget - Asisten Keuangan Pintar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <h1>SmartBudget</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="nav-btn" data-tab="transactions">Transaksi</button>
+                <button class="nav-btn" data-tab="analytics">Analisis</button>
+                <button class="nav-btn" data-tab="predictions">Prediksi</button>
+                <button class="nav-btn" data-tab="goals">Goals</button>
+                <button class="nav-btn" data-tab="health">Kesehatan</button>
+                <button id="settingsBtn" class="nav-btn" title="Pengaturan"><i class="fas fa-cog"></i></button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="container">
+
+                <!-- Calendar Popup Modal -->
+                <div id="calendarModal" class="calendar-modal">
+                    <div class="calendar-modal-content">
+                        <div class="calendar-modal-header">
+                            <h3>Pilih Tanggal</h3>
+                            <button id="closeCalendarBtn" class="close-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-navigation">
+                            <button id="prevMonthBtn" class="nav-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="month-year-display">
+                                <select id="monthSelect" class="month-select">
+                                    <option value="0">Januari</option>
+                                    <option value="1">Februari</option>
+                                    <option value="2">Maret</option>
+                                    <option value="3">April</option>
+                                    <option value="4">Mei</option>
+                                    <option value="5">Juni</option>
+                                    <option value="6">Juli</option>
+                                    <option value="7">Agustus</option>
+                                    <option value="8">September</option>
+                                    <option value="9">Oktober</option>
+                                    <option value="10">November</option>
+                                    <option value="11">Desember</option>
+                                </select>
+                                <select id="yearSelect" class="year-select">
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+                            <button id="nextMonthBtn" class="nav-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <div class="weekday">Min</div>
+                            <div class="weekday">Sen</div>
+                            <div class="weekday">Sel</div>
+                            <div class="weekday">Rab</div>
+                            <div class="weekday">Kam</div>
+                            <div class="weekday">Jum</div>
+                            <div class="weekday">Sab</div>
+                        </div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
+                    </div>
+                </div>
+
+                <!-- Calendar Search Button -->
+                <div class="calendar-search-button">
+                    <button id="openCalendarBtn" class="btn-calendar-search">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span id="selectedDateDisplay">Hari Ini</span>
+                    </button>
+                </div>
+
+                <!-- Balance Cards -->
+
+                <div class="balance-section">
+                    <div class="balance-card income">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Pemasukan</span>
+                            <span class="card-value" id="totalIncome">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-card expense">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Pengeluaran</span>
+                            <span class="card-value" id="totalExpense">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-card balance">
+                        <div class="card-icon">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Saldo Akhir</span>
+                            <span class="card-value" id="totalBalance">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day Details Section -->
+                <div class="day-details-section" id="dayDetails">
+                    <h3>📅 Detail Transaksi Tanggal: <span id="daySummaryDate">Pilih tanggal</span></h3>
+                    <div class="day-balance-cards">
+                        <div class="balance-card income">
+                            <div class="card-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div class="card-info">
+                                <span class="card-label">Pemasukan</span>
+                                <span class="card-value" id="dayTotalIncome">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="balance-card expense">
+                            <div class="card-icon">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                            <div class="card-info">
+                                <span class="card-label">Pengeluaran</span>
+                                <span class="card-value" id="dayTotalExpense">Rp 0</span>
+                            </div>
+                        </div>
+                        <div class="balance-card balance">
+                            <div class="card-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="card-info">
+                                <span class="card-label">Net</span>
+                                <span class="card-value" id="dayTotalBalance">Rp 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="transactions-list" id="dayTransactionsList">
+                        <p class="empty-state">Pilih tanggal untuk melihat detail transaksi</p>
+                    </div>
+                </div>
+
+                <!-- Add Transaction Form -->
+                <div class="form-section">
+                    <h2>Tambah Transaksi Baru</h2>
+                    <form id="transactionForm" class="transaction-form">
+                        <div class="form-group">
+                            <label for="amount">Jumlah</label>
+                            <input type="number" id="amount" placeholder="Rp" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Deskripsi</label>
+                            <input type="text" id="description" placeholder="Misal: Beli kopi, Gaji bulanan..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Tipe</label>
+                            <select id="type" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Kategori</label>
+                            <div class="category-group">
+                                <select id="categorySelect" class="category-dropdown">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    <option value="Makanan & Minuman">🍽️ Makanan & Minuman</option>
+                                    <option value="Transportasi">🚗 Transportasi</option>
+                                    <option value="Belanja & Kebutuhan">🛍️ Belanja & Kebutuhan</option>
+                                    <option value="Kesehatan & Kebugaran">🏥 Kesehatan & Kebugaran</option>
+                                    <option value="Hiburan & Rekreasi">🎮 Hiburan & Rekreasi</option>
+                                    <option value="Pendidikan">📚 Pendidikan</option>
+                                    <option value="Utilitas & Tagihan">💡 Utilitas & Tagihan</option>
+                                    <option value="Gaji & Pemasukan">💼 Gaji & Pemasukan</option>
+                                    <option value="Lainnya">❓ Lainnya</option>
+                                </select>
+                                <span class="ai-badge" id="aiCategoryBadge" title="Klik untuk saran AI berdasarkan deskripsi">
+                                    <i class="fas fa-sparkles"></i> AI Suggest
+                                </span>
+                            </div>
+                            <p class="ai-hint" id="aiHint"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Tanggal</label>
+                            <div class="date-input-group">
+                                <div class="date-input-wrapper">
+                                    <input type="date" id="date" required>
+                                    <span class="date-display" id="dateDisplay"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus"></i> Tambah Transaksi
+                        </button>
+                    </form>
+                    <p class="ai-hint" id="aiHint"></p>
+                </div>
+
+                <!-- Smart Recommendations -->
+                <div class="recommendations-section">
+                    <h2><i class="fas fa-lightbulb"></i> Rekomendasi Penghematan</h2>
+                    <div class="recommendations-list" id="recommendationsList">
+                        <p class="empty-state">Mulai tambahkan transaksi untuk mendapat rekomendasi cerdas...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Tab -->
+        <section id="transactions" class="tab-content">
+            <div class="container">
+                <h2>Riwayat Transaksi</h2>
+                <div class="transactions-filter">
+                    <input type="text" id="filterSearch" placeholder="Cari transaksi...">
+                    <select id="filterCategory">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+                <div class="transactions-list" id="transactionsList">
+                    <p class="empty-state">Belum ada transaksi</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Tab -->
+        <section id="analytics" class="tab-content">
+            <div class="container">
+                <h2>Analisis Arus Kas</h2>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Distribusi Pengeluaran</h3>
+                        <canvas id="categoryChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Distribusi Pemasukan</h3>
+                        <canvas id="incomeChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Tren Bulanan</h3>
+                        <canvas id="trendChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="analytics-card full-width">
+                        <h3>Pengeluaran Berdasarkan Kategori (Terbanyak ke Sedikit)</h3>
+                        <div class="ranking-list" id="expenseRanking">
+                            <!-- Expense ranking will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="analytics-card full-width">
+                        <h3>Pemasukan Berdasarkan Kategori (Terbanyak ke Sedikit)</h3>
+                        <div class="ranking-list" id="incomeRanking">
+                            <!-- Income ranking will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="analytics-card full-width">
+                        <h3>Statistik Detail</h3>
+                        <div class="stats-grid" id="statsGrid">
+                            <!-- Stats will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Predictions Tab -->
+        <section id="predictions" class="tab-content">
+            <div class="container">
+                <h2>Prediksi Keuangan Bulan Ini</h2>
+                
+                <div class="prediction-cards">
+                    <div class="prediction-card">
+                        <h3>Estimasi Saldo Akhir Bulan</h3>
+                        <div class="prediction-value" id="endBalancePrediction">Rp 0</div>
+                        <p class="prediction-hint">Berdasarkan rata-rata pengeluaran harian</p>
+                    </div>
+
+                    <div class="prediction-card">
+                        <h3>Status Keuangan</h3>
+                        <div class="status-badge" id="statusBadge">
+                            <i class="fas fa-check-circle"></i>
+                            Aman
+                        </div>
+                        <p class="prediction-hint" id="statusHint">Pengeluaran terkontrol</p>
+                    </div>
+
+                    <div class="prediction-card">
+                        <h3>Rata-rata Pengeluaran Harian</h3>
+                        <div class="prediction-value" id="dailyAverage">Rp 0</div>
+                        <p class="prediction-hint">Target pengeluaran optimal</p>
+                    </div>
+                </div>
+
+                <div class="prediction-advice">
+                    <h3>Saran Finansial AI</h3>
+                    <div id="predictionAdvice" class="advice-list">
+                        <p class="empty-state">Belum ada data untuk analisis</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Goals Tab -->
+        <section id="goals" class="tab-content">
+            <div class="container">
+                <h2><i class="fas fa-bullseye"></i> Target Keuangan</h2>
+                
+                <div class="goals-form-section">
+                    <h3>Tambah Target Baru</h3>
+                    <form id="goalsForm" class="goals-form">
+                        <div class="form-group">
+                            <label for="goalName">Nama Target</label>
+                            <input type="text" id="goalName" placeholder="Misal: Liburan, Cicilan Gadget..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="goalTarget">Target Jumlah (Rp)</label>
+                            <input type="number" id="goalTarget" placeholder="Rp" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="goalDeadline">Deadline</label>
+                            <input type="date" id="goalDeadline" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="goalCategory">Kategori</label>
+                            <select id="goalCategory">
+                                <option value="Tabungan">💰 Tabungan</option>
+                                <option value="Investasi">📈 Investasi</option>
+                                <option value="Pembelian">🛍️ Pembelian</option>
+                                <option value="Liburan">✈️ Liburan</option>
+                                <option value="Pendidikan">📚 Pendidikan</option>
+                                <option value="Lainnya">❓ Lainnya</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary" style="grid-column: 1 / -1;">
+                            <i class="fas fa-plus"></i> Tambah Target
+                        </button>
+                    </form>
+                </div>
+
+                <div class="goals-list-section">
+                    <h3>Daftar Target Aktif</h3>
+                    <div id="goalsList" class="goals-grid">
+                        <p class="empty-state">Belum ada target - mulai buat target finansial Anda!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Health Tab -->
+        <section id="health" class="tab-content">
+            <div class="container">
+                <h2><i class="fas fa-heart"></i> Kesehatan Finansial</h2>
+                
+                <div class="health-score-section">
+                    <div class="health-score-card">
+                        <div class="health-score-display">
+                            <div class="health-score-value" id="healthScore">75</div>
+                            <div class="health-score-label">/ 100</div>
+                        </div>
+                        <div class="health-score-details" id="healthScoreDetails">
+                            <p>Kesehatan finansial Anda sangat baik!</p>
+                        </div>
+                    </div>
+
+                    <div class="health-metrics-grid" id="healthMetrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Efisiensi Pengeluaran</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="metricExpense" style="width:75%;"></div>
+                            </div>
+                            <div class="metric-value" id="metricExpenseText">75%</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Pencapaian Target</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="metricGoal" style="width:0%;"></div>
+                            </div>
+                            <div class="metric-value" id="metricGoalText">0%</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Stabilitas Pendapatan</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="metricIncome" style="width:85%;"></div>
+                            </div>
+                            <div class="metric-value" id="metricIncomeText">85%</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Penghematan Bulanan</div>
+                            <div class="metric-bar">
+                                <div class="metric-fill" id="metricSavings" style="width:60%;"></div>
+                            </div>
+                            <div class="metric-value" id="metricSavingsText">60%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="health-insights-section">
+                    <h3>Insight Kesehatan Finansial</h3>
+                    <div id="healthInsights" class="insights-list">
+                        <p class="empty-state">Mulai catat transaksi untuk mendapat insights</p>
+                    </div>
+                </div>
+
+                <div class="weekly-summary-section">
+                    <h3>Ringkasan Mingguan</h3>
+                    <div id="weeklySummary" class="weekly-summary">
+                        <p class="empty-state">Data mingguan akan ditampilkan di sini</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 SmartBudget. Kelola keuangan Anda dengan cerdas. ✨</p>
+    </footer>
+
+    <!-- Settings Modal (Dark Mode & Tema) -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Pengaturan</h3>
+                <button class="modal-close" onclick="closeSettingsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h4>Tema Tampilan</h4>
+                    <div class="theme-options">
+                        <button class="theme-btn" data-theme="light" onclick="setTheme('light')">
+                            <i class="fas fa-sun"></i> Terang
+                        </button>
+                        <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')">
+                            <i class="fas fa-moon"></i> Gelap
+                        </button>
+                    </div>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
+
+                <div class="settings-group">
+                    <h4>Bahasa</h4>
+                    <div style="display:flex;gap:0.6rem;align-items:center;">
+                        <select id="languageSelect" style="padding:0.6rem 0.8rem;border-radius:8px;border:1px solid var(--border)">
+                            <option value="id">Bahasa Indonesia</option>
+                            <option value="en">English</option>
+                        </select>
+                        <span style="color:var(--text-light);font-size:0.9rem;">Pilih bahasa tampilan aplikasi</span>
+                    </div>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
+
+                <div class="settings-group">
+                    <h4>Notifikasi & Reminder</h4>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="notificationToggle" checked>
+                        <span>Aktifkan notifikasi pengeluaran berlebih</span>
+                    </label>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="dailyReminderToggle" checked>
+                        <span>Reminder catatan harian</span>
+                    </label>
+                </div>
+
+                <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e2e8f0;">
+
+                <div class="settings-group">
+                    <h4>Reset Aplikasi</h4>
+                    <p style="color:var(--text-light);font-size:0.9rem">Menghapus akan menghapus seluruh data dan pengaturan yang tersimpan di browser.</p>
+                    <button id="resetAllBtn" class="btn-secondary" style="background:#ffecec;border-color:#f5c2c2;color:var(--danger);">
+                        <i class="fas fa-trash"></i> Hapus Semua Data & Pengaturan
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeSettingsBtn" class="btn-secondary" onclick="closeSettingsModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Goal -->
+    <div id="editGoalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Target Keuangan</h3>
+                <button class="modal-close" onclick="closeEditGoalModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editGoalForm" class="goals-form">
+                    <div class="form-group">
+                        <label for="editGoalName">Nama Target</label>
+                        <input type="text" id="editGoalName" placeholder="Misal: Liburan, Cicilan Gadget..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGoalTarget">Target Jumlah (Rp)</label>
+                        <input type="number" id="editGoalTarget" placeholder="Rp" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editGoalDeadline">Deadline</label>
+                        <input type="date" id="editGoalDeadline" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGoalCategory">Kategori</label>
+                        <select id="editGoalCategory">
+                            <option value="Tabungan">💰 Tabungan</option>
+                            <option value="Investasi">📈 Investasi</option>
+                            <option value="Pembelian">🛍️ Pembelian</option>
+                            <option value="Liburan">✈️ Liburan</option>
+                            <option value="Pendidikan">📚 Pendidikan</option>
+                            <option value="Lainnya">❓ Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editGoalSaved">Dana Terkumpul (Rp)</label>
+                        <input type="number" id="editGoalSaved" placeholder="Rp" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeEditGoalModal()">Batal</button>
+                <button class="btn-primary" onclick="saveEditGoal()">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Transaksi -->
+    <div id="editTransactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Transaksi</h3>
+                <button class="modal-close" onclick="closeEditTransactionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editTransactionForm" class="transaction-form">
+                    <div class="form-group">
+                        <label for="editTxAmount">Jumlah</label>
+                        <input type="number" id="editTxAmount" placeholder="Rp" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTxDescription">Deskripsi</label>
+                        <input type="text" id="editTxDescription" placeholder="Misal: Beli kopi, Gaji..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTxType">Tipe</label>
+                        <select id="editTxType" required>
+                            <option value="">Pilih Tipe</option>
+                            <option value="income">Pemasukan</option>
+                            <option value="expense">Pengeluaran</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTxCategory">Kategori</label>
+                        <select id="editTxCategory" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="Makanan & Minuman">🍽️ Makanan & Minuman</option>
+                            <option value="Transportasi">🚗 Transportasi</option>
+                            <option value="Belanja & Kebutuhan">🛍️ Belanja & Kebutuhan</option>
+                            <option value="Kesehatan & Kebugaran">🏥 Kesehatan & Kebugaran</option>
+                            <option value="Hiburan & Rekreasi">🎮 Hiburan & Rekreasi</option>
+                            <option value="Pendidikan">📚 Pendidikan</option>
+                            <option value="Utilitas & Tagihan">💡 Utilitas & Tagihan</option>
+                            <option value="Gaji & Pemasukan">💼 Gaji & Pemasukan</option>
+                            <option value="Lainnya">❓ Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTxDate">Tanggal</label>
+                        <input type="date" id="editTxDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeEditTransactionModal()">Batal</button>
+                <button class="btn-primary" onclick="saveEditTransaction()">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Book Popup -->
+    <div id="manualBookPopup" class="manual-book-popup">
+        <div class="manual-book-header">
+            <h3><i class="fas fa-book"></i> Manual Book</h3>
+            <button class="manual-book-close" onclick="closeManualBook()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="manual-book-content">
+            <h2>Manual Book Aplikasi SmartBudget</h2>
+            
+            <div class="manual-section">
+                <h3>1. Pendahuluan</h3>
+                <p>SmartBudget adalah aplikasi manajemen keuangan pribadi berbasis web yang membantu pengguna mencatat pemasukan, pengeluaran, menganalisis kondisi keuangan, serta memprediksi saldo di masa depan. Aplikasi ini juga dilengkapi fitur cerdas seperti rekomendasi keuangan otomatis, kategori transaksi otomatis, dan kalender keuangan.</p>
+                <p>Manual book ini menjelaskan cara penggunaan setiap fitur dalam aplikasi SmartBudget.</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>2. Cara Masuk ke Aplikasi</h3>
+                <p>Buka browser dan akses URL aplikasi SmartBudget.</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>3. Beranda (Dashboard)</h3>
+                <p>Pada beranda, pengguna dapat melihat ringkasan keuangan berdasarkan tanggal.</p>
+                <p><strong>Informasi yang Ditampilkan:</strong></p>
+                <ul>
+                    <li>Saldo Awal hari ini</li>
+                    <li>Total Pemasukan hari ini</li>
+                    <li>Total Pengeluaran hari ini</li>
+                    <li>Saldo Akhir hari ini</li>
+                </ul>
+                <p><strong>Pemilih Tanggal (Date Slider)</strong></p>
+                <ul>
+                    <li>Pengguna dapat menggeser tanggal ke hari sebelumnya atau setelahnya.</li>
+                    <li>Data tetap dimulai dari tanggal pertama kali transaksi dimasukkan.</li>
+                </ul>
+            </div>
+
+            <div class="manual-section">
+                <h3>4. Fitur Transaksi</h3>
+                <p>Digunakan untuk menambah, mengelola, dan menghapus transaksi.</p>
+                <p><strong>Menambahkan Transaksi:</strong></p>
+                <ol>
+                    <li>Masuk ke menu Transaksi.</li>
+                    <li>Klik Tambah Transaksi.</li>
+                    <li>Pilih jenis transaksi: Pemasukan atau Pengeluaran.</li>
+                    <li>Isi nominal, kategori, dan deskripsi.</li>
+                    <li>Klik Simpan.</li>
+                </ol>
+                <p><strong>Mengedit Transaksi:</strong></p>
+                <ol>
+                    <li>Pilih transaksi dari daftar.</li>
+                    <li>Klik Edit.</li>
+                    <li>Ubah data sesuai kebutuhan.</li>
+                    <li>Klik Update.</li>
+                </ol>
+                <p><strong>Menghapus Transaksi:</strong></p>
+                <ol>
+                    <li>Pilih transaksi yang ingin dihapus.</li>
+                    <li>Klik Hapus.</li>
+                </ol>
+            </div>
+
+            <div class="manual-section">
+                <h3>5. Fitur Analisis Cerdas</h3>
+                <p>Fitur ini memberikan insight otomatis berdasarkan pola transaksi.</p>
+                <p><strong>Yang Dianalisis:</strong></p>
+                <ul>
+                    <li>Kategori dengan pengeluaran terbesar.</li>
+                    <li>Pola pengeluaran mingguan.</li>
+                    <li>Perbandingan pemasukan dan pengeluaran.</li>
+                    <li>Peringatan jika pengeluaran melewati batas wajar.</li>
+                </ul>
+                <p><strong>Contoh Insight:</strong></p>
+                <ul>
+                    <li>"Pengeluaran makan meningkat 25% dari minggu lalu."</li>
+                    <li>"Anda terlalu banyak mengeluarkan dana untuk transportasi bulan ini."</li>
+                </ul>
+            </div>
+
+            <div class="manual-section">
+                <h3>6. Prediksi Saldo Akhir Bulan</h3>
+                <p>Aplikasi memperkirakan saldo akhir bulan berdasarkan:</p>
+                <ul>
+                    <li>Rata-rata pengeluaran harian</li>
+                    <li>Pemasukan yang sudah tercatat</li>
+                    <li>Sisa hari dalam bulan</li>
+                </ul>
+                <p>Tampilan berupa grafik naik atau turun.</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>7. Fitur Kalender Keuangan</h3>
+                <p>Fitur kalender memungkinkan pengguna melihat transaksi berdasarkan tanggal dalam tampilan kalender.</p>
+                <p><strong>Fungsi Kalender:</strong></p>
+                <ul>
+                    <li>Menampilkan setiap tanggal dalam bentuk kalender bulanan.</li>
+                    <li>Menunjukkan tanggal yang memiliki transaksi dengan highlight.</li>
+                    <li>Menampilkan total pemasukan, pengeluaran, dan saldo pada hari yang dipilih.</li>
+                    <li>Saat tanggal dipilih, muncul detail transaksi pada hari tersebut.</li>
+                </ul>
+                <p><strong>Cara Menggunakan Kalender:</strong></p>
+                <ol>
+                    <li>Buka menu Kalender.</li>
+                    <li>Pilih bulan yang ingin dilihat.</li>
+                    <li>Pilih tanggal untuk melihat rincian transaksi.</li>
+                </ol>
+            </div>
+
+            <div class="manual-section">
+                <h3>8. Target Keuangan (Goals)</h3>
+                <p>Pengguna dapat membuat target tabungan atau rencana keuangan tertentu.</p>
+                <p><strong>Cara Menambah Target:</strong></p>
+                <ol>
+                    <li>Masuk ke menu Goals.</li>
+                    <li>Klik Tambah Target.</li>
+                    <li>Masukkan nama target, jumlah target, dan batas waktu.</li>
+                    <li>Simpan.</li>
+                </ol>
+                <p>Aplikasi akan memberikan status apakah pengguna masih on-track.</p>
+            </div>
+
+            <div class="manual-section">
+                <h3>Penutup</h3>
+                <p>Manual book ini dirancang untuk membantu pengguna memahami seluruh fitur SmartBudget dengan mudah. Dengan fitur analisis cerdas dan tampilan sederhana, SmartBudget dapat menjadi asisten keuangan harian yang efektif.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Book Button -->
+    <button id="manualBookBtn" class="manual-book-btn" title="Manual Book" onclick="openManualBook()">
+        <i class="fas fa-book"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="nlp.js"></script>
+    <script src="ai.js"></script>
+    <script src="app.js"></script>
+                        <!-- date picker modal removed (replaced by compact inline calendar) -->
+</body>
+</html>

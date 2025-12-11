@@ -1,0 +1,358 @@
+<!-- 
+    FILE DEMO DATA
+    
+    Buka file ini di browser untuk melihat SmartBudget dengan sample data.
+    Data ini hanya untuk demonstrasi - tidak akan tersimpan permanen.
+    
+    Untuk menggunakan file ini:
+    1. Buka di browser
+    2. Klik tombol "Load Sample Data"
+    3. Data akan dimuat dan Anda bisa melihat semua fitur dalam aksi
+-->
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBudget - Demo dengan Sample Data</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .demo-banner {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #ea580c;
+        }
+        
+        .demo-banner h2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .demo-btn {
+            background: white;
+            color: #f59e0b;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .demo-btn.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .demo-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Banner -->
+    <div class="demo-banner">
+        <h2>🎉 Welcome to SmartBudget Demo!</h2>
+        <p>Coba semua fitur dengan data sampel yang sudah disiapkan</p>
+        <div class="demo-buttons">
+            <button class="demo-btn" onclick="loadSampleData()">
+                <i class="fas fa-download"></i> Muat Data Sampel
+            </button>
+            <button class="demo-btn secondary" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-right"></i> Mulai dari Awal
+            </button>
+        </div>
+        <div class="demo-info">
+            <strong>💡 Tips:</strong> Data sampel mencakup transaksi selama 30 hari dengan berbagai kategori. 
+            Anda bisa melihat prediksi, analisis, dan rekomendasi AI dalam aksi!
+        </div>
+    </div>
+
+    <!-- Sama seperti index.html -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <h1>SmartBudget</h1>
+            </div>
+            <nav class="nav">
+                <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="nav-btn" data-tab="transactions">Transaksi</button>
+                <button class="nav-btn" data-tab="analytics">Analisis</button>
+                <button class="nav-btn" data-tab="predictions">Prediksi</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <div class="container">
+                <div class="balance-section">
+                    <div class="balance-card income">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Pemasukan</span>
+                            <span class="card-value" id="totalIncome">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-card expense">
+                        <div class="card-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Pengeluaran</span>
+                            <span class="card-value" id="totalExpense">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="balance-card balance">
+                        <div class="card-icon">
+                            <i class="fas fa-piggy-bank"></i>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Saldo Akhir</span>
+                            <span class="card-value" id="totalBalance">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Tambah Transaksi Baru</h2>
+                    <form id="transactionForm" class="transaction-form">
+                        <div class="form-group">
+                            <label for="amount">Jumlah</label>
+                            <input type="number" id="amount" placeholder="Rp" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Deskripsi</label>
+                            <input type="text" id="description" placeholder="Misal: Beli kopi, Gaji bulanan..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Tipe</label>
+                            <select id="type" required>
+                                <option value="">Pilih Tipe</option>
+                                <option value="income">Pemasukan</option>
+                                <option value="expense">Pengeluaran</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Kategori</label>
+                            <div class="category-input-wrapper">
+                                <input type="text" id="category" placeholder="Ketik untuk kategori otomatis..." required>
+                                <span class="ai-badge" id="aiCategoryBadge">
+                                    <i class="fas fa-sparkles"></i> AI
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Tanggal</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus"></i> Tambah Transaksi
+                        </button>
+                    </form>
+                    <p class="ai-hint" id="aiHint"></p>
+                </div>
+
+                <div class="recommendations-section">
+                    <h2><i class="fas fa-lightbulb"></i> Rekomendasi Penghematan</h2>
+                    <div class="recommendations-list" id="recommendationsList">
+                        <p class="empty-state">Mulai tambahkan transaksi untuk mendapat rekomendasi cerdas...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Tab -->
+        <section id="transactions" class="tab-content">
+            <div class="container">
+                <h2>Riwayat Transaksi</h2>
+                <div class="transactions-filter">
+                    <input type="text" id="filterSearch" placeholder="Cari transaksi...">
+                    <select id="filterCategory">
+                        <option value="">Semua Kategori</option>
+                    </select>
+                </div>
+                <div class="transactions-list" id="transactionsList">
+                    <p class="empty-state">Belum ada transaksi</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Tab -->
+        <section id="analytics" class="tab-content">
+            <div class="container">
+                <h2>Analisis Arus Kas</h2>
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Distribusi Pengeluaran</h3>
+                        <canvas id="categoryChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>Tren Bulanan</h3>
+                        <canvas id="trendChart" width="400" height="300"></canvas>
+                    </div>
+
+                    <div class="analytics-card full-width">
+                        <h3>Statistik Detail</h3>
+                        <div class="stats-grid" id="statsGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Predictions Tab -->
+        <section id="predictions" class="tab-content">
+            <div class="container">
+                <h2>Prediksi Keuangan Bulan Ini</h2>
+                <div class="prediction-cards">
+                    <div class="prediction-card">
+                        <h3>Estimasi Saldo Akhir Bulan</h3>
+                        <div class="prediction-value" id="endBalancePrediction">Rp 0</div>
+                        <p class="prediction-hint">Berdasarkan rata-rata pengeluaran harian</p>
+                    </div>
+
+                    <div class="prediction-card">
+                        <h3>Status Keuangan</h3>
+                        <div class="status-badge" id="statusBadge">
+                            <i class="fas fa-check-circle"></i> Aman
+                        </div>
+                        <p class="prediction-hint" id="statusHint">Pengeluaran terkontrol</p>
+                    </div>
+
+                    <div class="prediction-card">
+                        <h3>Rata-rata Pengeluaran Harian</h3>
+                        <div class="prediction-value" id="dailyAverage">Rp 0</div>
+                        <p class="prediction-hint">Target pengeluaran optimal</p>
+                    </div>
+                </div>
+
+                <div class="prediction-advice">
+                    <h3>Saran Finansial AI</h3>
+                    <div id="predictionAdvice" class="advice-list">
+                        <p class="empty-state">Belum ada data untuk analisis</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SmartBudget. Kelola keuangan Anda dengan cerdas. ✨</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="nlp.js"></script>
+    <script src="ai.js"></script>
+    <script src="app.js"></script>
+    
+    <script>
+        // Sample data generator
+        function loadSampleData() {
+            const today = new Date();
+            const sampleTransactions = [];
+            
+            // Generate 30 days of sample data
+            for (let i = 30; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // Daily income (gaji diterima 1x sebulan, di awal bulan)
+                if (i === 30) {
+                    sampleTransactions.push({
+                        id: Date.now() + Math.random(),
+                        amount: 5000000,
+                        description: 'Gaji Bulanan',
+                        type: 'income',
+                        category: 'Gaji & Pemasukan',
+                        date: dateStr,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+                
+                // Random expenses
+                const expenses = [
+                    { desc: 'Beli Kopi Latte', cat: 'Makanan & Minuman', amount: 45000 },
+                    { desc: 'Sarapan Nasi Kuning', cat: 'Makanan & Minuman', amount: 25000 },
+                    { desc: 'Makan Siang', cat: 'Makanan & Minuman', amount: 65000 },
+                    { desc: 'Isi Bensin', cat: 'Transportasi', amount: 150000 },
+                    { desc: 'Parkir', cat: 'Transportasi', amount: 10000 },
+                    { desc: 'Gojek ke Kantor', cat: 'Transportasi', amount: 25000 },
+                    { desc: 'Beli Baju di Mall', cat: 'Belanja & Kebutuhan', amount: 350000 },
+                    { desc: 'Belanja Kebutuhan', cat: 'Belanja & Kebutuhan', amount: 200000 },
+                    { desc: 'Dokter Gigi', cat: 'Kesehatan & Kebugaran', amount: 500000 },
+                    { desc: 'Beli Vitamin', cat: 'Kesehatan & Kebugaran', amount: 75000 },
+                    { desc: 'Gym Membership', cat: 'Kesehatan & Kebugaran', amount: 250000 },
+                    { desc: 'Nonton Bioskop', cat: 'Hiburan & Rekreasi', amount: 100000 },
+                    { desc: 'Netflix Subscription', cat: 'Hiburan & Rekreasi', amount: 54000 },
+                    { desc: 'Beli Buku', cat: 'Pendidikan', amount: 120000 },
+                    { desc: 'Listrik Rumah', cat: 'Utilitas & Tagihan', amount: 350000 },
+                    { desc: 'Tagihan Internet', cat: 'Utilitas & Tagihan', amount: 300000 },
+                    { desc: 'Pulsa HP', cat: 'Utilitas & Tagihan', amount: 50000 },
+                ];
+                
+                // Add 1-3 random expenses per day
+                const expensesCount = Math.floor(Math.random() * 3) + 1;
+                for (let j = 0; j < expensesCount; j++) {
+                    const expense = expenses[Math.floor(Math.random() * expenses.length)];
+                    const variation = 0.8 + Math.random() * 0.4; // 80-120% variation
+                    
+                    sampleTransactions.push({
+                        id: Date.now() + Math.random(),
+                        amount: Math.floor(expense.amount * variation),
+                        description: expense.desc,
+                        type: 'expense',
+                        category: expense.cat,
+                        date: dateStr,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('smartbudget_transactions', JSON.stringify(sampleTransactions));
+            
+            // Reload page
+            window.location.reload();
+        }
+        
+        // Auto-load sample data if empty
+        if (!localStorage.getItem('smartbudget_transactions')) {
+            console.log('💡 Tip: Klik "Muat Data Sampel" untuk melihat demo lengkap!');
+        }
+    </script>
+</body>
+</html>
